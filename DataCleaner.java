@@ -101,5 +101,34 @@ public class DataCleaner {
         // Если не удалось распарсить — возвращаем как есть, но очищенное
         return cleaned.isEmpty() ? "" : cleaned;
     }
-    
+
+    private static String fixEmail(String raw) {
+        if (raw.isEmpty()) return "";
+        // Убираем пробелы
+        String cleaned = raw.replaceAll("\\s+", "");
+        // Убираем повторяющиеся @ и .
+        cleaned = cleaned.replaceAll("\\.{2,}", ".")
+                .replaceAll("@{2,}", "@");
+
+        // Проверяем базовую структуру email
+        Pattern emailPattern = Pattern.compile(
+                "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+        );
+        Matcher m = emailPattern.matcher(cleaned);
+
+        if (m.matches()) {
+            return cleaned;
+        }
+
+        // Пытаемся исправить частые ошибки
+        // Если нет @ — не email
+        if (!cleaned.contains("@")) return "";
+
+        // Пытаемся убрать лишние точки в домене
+        cleaned = cleaned.replaceAll("\\.+", ".");
+
+        // Проверяем ещё раз
+        m = emailPattern.matcher(cleaned);
+        return m.matches() ? cleaned : "";
+    }
 }
