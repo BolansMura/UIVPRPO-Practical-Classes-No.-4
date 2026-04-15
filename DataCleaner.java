@@ -61,4 +61,18 @@ public class DataCleaner {
         }
         return result.toString().trim();
     }
+
+    private static String fixAge(String raw) {
+        if (raw.isEmpty()) return "";
+        // Убираем всё кроме цифр и минуса
+        String cleaned = raw.replaceAll("[^\\d-]", "");
+        try {
+            int age = Integer.parseInt(cleaned);
+            age = Math.abs(age); // убираем минус
+            if (age < 0 || age > 150) return "";
+            return String.valueOf(age);
+        } catch (NumberFormatException e) {
+            return "";
+        }
+    }
 }
