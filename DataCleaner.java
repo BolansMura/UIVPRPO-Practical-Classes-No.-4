@@ -75,4 +75,31 @@ public class DataCleaner {
             return "";
         }
     }
+
+    private static String fixPhone(String raw) {
+        if (raw.isEmpty()) return "";
+        // Оставляем только цифры и плюс в начале
+        String cleaned = raw.replaceAll("[^\\d+]", "");
+        // Убираем все плюсы кроме первого
+        if (cleaned.startsWith("+")) {
+            cleaned = "+" + cleaned.replaceAll("\\+", "");
+        } else {
+            cleaned = cleaned.replaceAll("\\+", "");
+        }
+
+        // Пытаемся привести к формату +X (XXX) XXX-XX-XX
+        Pattern p = Pattern.compile("^(\\+?\\d{1,3})?(\\d{3})(\\d{3})(\\d{2})(\\d{2})$");
+        Matcher m = p.matcher(cleaned.replaceAll("\\D", ""));
+
+        if (m.find()) {
+            String country = m.group(1) != null ? m.group(1) : "+7";
+            if (!country.startsWith("+")) country = "+" + country;
+            return String.format("%s (%s) %s-%s-%s",
+                    country, m.group(2), m.group(3), m.group(4), m.group(5));
+        }
+
+        // Если не удалось распарсить — возвращаем как есть, но очищенное
+        return cleaned.isEmpty() ? "" : cleaned;
+    }
+    
 }
