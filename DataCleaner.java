@@ -44,5 +44,21 @@ public class DataCleaner {
         return String.join("|", name, age, phone, email);
     }
 
-   
+   private static String fixName(String raw) {
+        if (raw.isEmpty()) return "";
+
+        // Разделяем слитные ИмяФамилия по заглавным буквам
+        String withSpaces = raw.replaceAll("([а-яёa-z])([А-ЯЁA-Z])", "$1 $2");
+        // Приводим к формату: первая буква заглавная, остальные строчные
+        String[] words = withSpaces.split("\\s+");
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            if (word.length() > 0) {
+                String formatted = Character.toUpperCase(word.charAt(0)) +
+                        word.substring(1).toLowerCase();
+                result.append(formatted).append(" ");
+            }
+        }
+        return result.toString().trim();
+    }
 }
